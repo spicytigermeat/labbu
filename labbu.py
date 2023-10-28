@@ -1,13 +1,18 @@
-import sys
-import os
-import re
+import sys, os, re
 import mytextgrid
 from pathlib import Path
 
 class labbu:
-	def __init__(self):
+	def __init__(self, lang='default'):
 		super().__init__()
-		self.default_phones={
+		#initialize language from kwargs
+		if lang != 'default':
+			with open(lang, 'r', encoding='utf-8') as f:
+				self.pho_dict = {line.split(' ')[0]: line.rstrip().split(' ')[1] for line in f}
+				f.close()
+		else:
+			#default to my prewritten phoneme dictionary
+			self.pho_dict={
 		'AP':'stop', 'SP':'stop', 
 		'pau':'stop', 'sil':'stop',
 		'a':'vowel', 'aa':'vowel', 'ae':'vowel', 'ah':'vowel', 'ao':'vowel', 'aw':'vowel', 'ax':'vowel', 'ay':'vowel', 
@@ -36,11 +41,13 @@ class labbu:
 		'y':'semivowel',
 		'z':'fricative', 'zh':'fricative',
 		'spn': 'stop'}
+
 		self.palatal_consonants = ['by', 'dy', 'fy', 'gy', 'hy',
 								   'jy', 'ky', 'ly', 'my', 'ny',
 								   'py', 'ry', 'ty', 'vy', 'zy']
 		self.plosive_consonants = ['b', 'bcl', 'd', 'dcl', 'g', 'gcl', 'k', 'kcl', 'p', 'pcl', 't', 'tcl']
-		self.silence_phones = ['AP', 'SP', 'br', 'pau', 'sil', 'spn']
+		self.silence_phones = ['SP', 'pau', 'sil', 'spn']
+		self.breath_phones = ['AP', 'br']
 		self.depal_length = 355000
 
 	#loads the label. can be used to save a lab to a dict as well
@@ -57,7 +64,7 @@ class labbu:
 
 	#loads lab from textgrid. meant for MFA TextGrids :3
 	#code referenced from the amazing HAI-D (overdramatic on github)
-	def load_lab_from_textgrid(self, fpath):
+	def load_lab_from_textgrid(self, fpath, silence='SP', breath='AP'):
 		self.lab = []
 		tg = mytextgrid.read_from_file(fpath)
 		for tier in tg:
@@ -67,20 +74,11 @@ class labbu:
 					time_end = int(float(interval.xmax)*10000000)
 					label = interval.text
 					if label == '':
-						label = 'pau'
+						label = silence
+					if label in self.breath_phones:
+						label = breath
 					self.lab.append({'phone': label,'start': time_start,'end': time_end})
 		return self.lab
-
-	def init_lang(self, fpath):
-		#load a dict of phonemes in the labels with the type it is
-		if fpath == 'default':
-			self.pho_dict = self.default_phones
-			del self.default_phones #trying to keep things clean?
-		else:
-			with open(fpath, 'r', encoding='utf-8') as f:
-				self.pho_dict = {line.split(' ')[0]: line.rstrip().split(' ')[1] for line in f}
-				f.close()
-		return self.pho_dict
 
 	#debug/reference to print the phoneme dictionary.
 	def validate_phonemes(self):
@@ -99,10 +97,7 @@ class labbu:
 
 	#checks if current index is the first or last in the label
 	def is_boe(self, i):
-		if i == 0 or i == len(self.lab):
-			return True
-		else:
-			return False
+		return True if i == 0 or i == len(self.lab) else False
 
 	#returns the length of the label as an int
 	def get_length(self):
@@ -128,12 +123,12 @@ class labbu:
 			print(f'Unable to merge label at index {i}. Make sure it is not the end of the file!')
 
 	#makes palatalized consonants [ky] into 2 seperate consonants [k] [y]
-	#places the end of [y] 355000 units into the consonant, to guess where ti would be?
+	#places the end of [y] 355000 units into the consonant, to guess where it would be?
 	#input should be index of palatilized consonant
 	def depalatilize(self, i):
 		#check if next label is a vowel
-		assert self.is_palatal(self.lab[i]['phone'])
-		if self.is_vowel(self.next_phone(i)):
+		assert self.is_type(self.lab[i]['phone'], 'palatal')
+		if self.is_type(self.next_phone(i), 'vowel'):
 			#define where the y be starting!
 			y_start = int(self.lab[i]['end'])
 			y_end = y_start + self.depal_length
@@ -198,108 +193,22 @@ class labbu:
 				print('IndexError: Please verify your output is correct!')
 				pass
 
-	def is_vowel(self, phone): #returns true if phoneme is a vowel
-		phone_type = self.pho_dict[phone]
+	#returns true if phoneme (arg1) is a certain type (arg2)
+	# labu.is_type('aa', 'vowel') returns 'True'
+	def is_type(self, phone, ph_type):
 		try:
-			if phone_type == 'vowel':
-				return True
+			if ph_type == 'plosive':
+				return True if phone in self.plosive_consonants else False
+			elif ph_type == 'palatal':
+				return True if phone in self.palatal_consonants and not self.is_type(phone, 'vowel') else False
+			elif ph_type == 'silence':
+				return True if phone in self.silence_phones else False
 			else:
-				return False
-		except:
-			print('Phoneme not in language.')
+				curr_type = self.pho_dict[phone]
+				return True if curr_type == ph_type else False
+		except KeyError as e:
+			print(f"ERR: Phoneme not defined, returning False | {e}")
 			return False
-
-	def is_consonant(self, phone): #returns true if phoneme is not a vowel
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type != 'vowel':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_stop(self, phone): #returns true if phoneme is a stop
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'stop':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_fricative(self, phone): #returns true if phoneme is a fricative
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'fricative':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_nasal(self, phone): #returns true if phoneme is a nasal
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'nasal':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_liquid(self, phone): #returns true if phoneme is a liquid
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'liquid':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_affricate(self, phone): #returns true if phoneme is an affricate
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'affricate':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	def is_semivowel(self, phone): #returns true if phoneme is a semivowel
-		phone_type = self.pho_dict[phone]
-		try:
-			if phone_type == 'stop':
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme not in language.')
-			return False
-
-	#a special one that does not check the lang def file.
-	def is_plosive(self, phone):
-		try:
-			if phone in self.plosive_consonants:
-				return True
-			else:
-				return False
-		except:
-			print('Phoneme is not a plosive.')
-			return False
-
-	#this one is gonna be SILLY! update: it wasn't that silly
-	def is_palatal(self, phone):
-		return True if phone in self.palatal_consonants and not self.is_vowel(phone) else False
 
 	def export_lab(self, output_name): #exports the label file
 		#build output string
@@ -312,12 +221,12 @@ class labbu:
 			output_name = p.stem + '.lab'
 
 		with open(output_name, 'w+', encoding='utf-8') as out:
-			out.write(output_text)
 			out.seek(0)
+			out.write(output_text)
 			out.close()
 
+	#remove any numbers from the phone and lower it, but leave SP and AP alone
 	def clean_phones(self, i):
-		#remove any numbers from the phone and lower it, but leave SP and AP alone
 		if self.curr_phone(i) != 'SP' or self.curr_phone(i) != 'AP':
 			try:
 				new_phone = re.sub(r'[0-9]', '', self.curr_phone(i))
@@ -345,9 +254,6 @@ class labbu:
 				dur_list.append(self.get_pho_len(i))
 		return dur_list.mean()
 
-	def is_silence(self, phone):
-		return True if phone in self.silence_phones else False
-
 	#this is untested heehee
 	def adjust_lab_end(self, i, factor):
 		new_end = self.lab[i]['end'] + factor
@@ -355,7 +261,7 @@ class labbu:
 		self.lab[i+1]['start'] = new_end
 
 	def is_between_vowels(self, i):
-		return True if self.is_vowel(self.next_phone(i)) and self.is_vowel(self.prev_phone(i)) else False
+		return True if self.is_type(self.next_phone(i), 'vowel') and self.is_type(self.prev_phone(i), 'vowel') else False
 
 	#converts lab from enunu-style to diffsinger-style
 	#(pau, br) > (SP, AP)
@@ -363,14 +269,13 @@ class labbu:
 		self.replace_all('pau', 'SP')
 		self.replace_all('br', 'AP')
 
-	#putting this in here for solidarity but lets be honest
-	#no one is using enunu anymore
-	#lol
 	def diff2enunu(self):
 		self.replace_all('SP', 'pau')
 		self.replace_all('AP', 'br')
 
+	#unloads the label, you never know if you'll need it
 	def unload_lab(self):
+		del self.lab
 		self.lab = []
 
 	def fix_spap(self):
@@ -378,15 +283,5 @@ class labbu:
 			if self.lab[i]['phone'] == 'sp' or self.lab[i]['phone'] == 'ap':
 				self.lab[i]['phone'] = self.lab[i]['phone'].upper()
 
-
 if __name__ == '__main__':
-
-	#to initialize labUtil. My recommended variable name is 'labu'
-	labu = labUtil()
-	labu.load_lang_defs('default')
-
-	labu.load_lab('MCUR-17.lab')
-
-	labu.normalize_time()
-
-	labu.export_lab('MCUR-17_corrected.lab')
+	labu = labbu()
