@@ -15,3 +15,5 @@ for i in range(len(labu.get_length())): #check in each index of the lab file
 labu.export_lab({output_path})
 ```
 Further documentation and examples will come as labbu is developed.
+# Citations
+Loading from Praat TextGrid was referenced from [Overdramatic's "text2lab" (Thank you!)](https://github.com/overdramatic/text2lab)
