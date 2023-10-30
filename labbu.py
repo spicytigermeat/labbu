@@ -10,37 +10,51 @@ class labbu:
 			with open(lang, 'r', encoding='utf-8') as f:
 				self.pho_dict = {line.split(' ')[0]: line.rstrip().split(' ')[1] for line in f}
 				f.close()
+		elif lang == 'japanese':
+			#is 'N' usually considered a vowel? Not sure, but adding this since i feel like it's worth it.
+			self.pho_dict={
+				'AP':'stop', 'SP':'stop','pau':'stop','sil','stop','br':'stop',
+				'a':'vowel', 'i':'vowel', 'u':'vowel', 'e':'vowel', 'o':'vowel', 'N':'vowel'
+				'b':'stop', 'by':'stop', 'ch':'affricate', 'd':'stop', 'dy':'stop',
+				'cl':'stop', 'f':'fricative', 'fy':'fricative', 'g':'stop', 'gy':'stop',
+				'h':'fricative', 'hy':'fricative', 'j':'affricate', #jh in english
+				'k':'stop', 'ky':'stop', 'l':'liquid', 'ly':'liquid', 'm':'nasal',
+				'my':'nasal', 'n':'nasal', 'ny':'nasal', 'p':'stop', 'py':'stop',
+				'r':'stop', 'ry':'stop', 's':'fricative', 'sh':'fricative',
+				't':'stop', 'ts':'affricate', 'v':'fricative', 'vy':'fricative',
+				'w':'semivowel', 'y':'semivowel', 'z':'fricative', 'zy':'fricative'
+				'vf':'stop', 'spn':'stop'}
 		else:
 			#default to my prewritten phoneme dictionary
 			self.pho_dict={
-		'AP':'stop', 'SP':'stop', 
-		'pau':'stop', 'sil':'stop',
-		'a':'vowel', 'aa':'vowel', 'ae':'vowel', 'ah':'vowel', 'ao':'vowel', 'aw':'vowel', 'ax':'vowel', 'ay':'vowel', 
-		'b':'stop', 'bcl':'stop', 'by':'stop',
-		'cl':'stop', 'ch':'affricate',
-		'd':'stop', 'dh':'fricative', 'dx':'stop', 'dcl':'stop', 'dy':'stop',
-		'e':'vowel', 'eh':'vowel', 'er':'vowel', 'en':'vowel', 'eng':'vowel', 'ey':'vowel', 'el':'vowel', 'em':'vowel', 'ee':'vowel',
-		'f':'fricative', 'fy':'fricative',
-		'g':'stop', 'gcl':'stop', 'gy':'stop',
-		'hh':'fricative', 'h':'fricative', 'hy':'fricative', 'hv':'fricative',
-		'i':'vowel', 'ih':'vowel', 'iy':'vowel', 'ix':'vowel', 'ii':'vowel',
-		'j':'fricative', 'jh':'affricate',
-		'k':'stop', 'kcl': 'stop', 'ky':'stop',
-		'l':'liquid',
-		'm':'nasal', 'my':'nasal',
-		'n':'nasal', 'ng':'nasal', 'nx':'nasal', 'ny':'nasal', 'N':'nasal',
-		'o':'vowel', 'ow':'vowel', 'ox':'vowel', 'oy':'vowel', 'oo':'vowel',
-		'p':'stop', 'pcl':'stop', 'py':'stop',
-		'q':'stop',
-		'r':'liquid', 'rr':'stop', 'rx':'fricative', 'ry':'stop',
-		's':'fricative', 'sh':'fricative',
-		't':'stop', 'tcl':'stop', 'th':'fricative', 'ty':'stop',
-		'u':'vowel', 'uh':'vowel', 'uw':'vowel', 'uu':'vowel', 'ux':'vowel',
-		'v':'fricative', 'vf':'stop',
-		'w':'semivowel',
-		'y':'semivowel',
-		'z':'fricative', 'zh':'fricative',
-		'spn': 'stop'}
+				'AP':'stop', 'SP':'stop', 
+				'pau':'stop', 'sil':'stop',
+				'a':'vowel', 'aa':'vowel', 'ae':'vowel', 'ah':'vowel', 'ao':'vowel', 'aw':'vowel', 'ax':'vowel', 'ay':'vowel', 
+				'b':'stop', 'bcl':'stop', 'by':'stop',
+				'cl':'stop', 'ch':'affricate',
+				'd':'stop', 'dh':'fricative', 'dx':'stop', 'dcl':'stop', 'dy':'stop',
+				'e':'vowel', 'eh':'vowel', 'er':'vowel', 'en':'vowel', 'eng':'vowel', 'ey':'vowel', 'el':'vowel', 'em':'vowel', 'ee':'vowel',
+				'f':'fricative', 'fy':'fricative',
+				'g':'stop', 'gcl':'stop', 'gy':'stop',
+				'hh':'fricative', 'h':'fricative', 'hy':'fricative', 'hv':'fricative',
+				'i':'vowel', 'ih':'vowel', 'iy':'vowel', 'ix':'vowel', 'ii':'vowel',
+				'j':'fricative', 'jh':'affricate',
+				'k':'stop', 'kcl': 'stop', 'ky':'stop',
+				'l':'liquid',
+				'm':'nasal', 'my':'nasal',
+				'n':'nasal', 'ng':'nasal', 'nx':'nasal', 'ny':'nasal', 'N':'nasal',
+				'o':'vowel', 'ow':'vowel', 'ox':'vowel', 'oy':'vowel', 'oo':'vowel',
+				'p':'stop', 'pcl':'stop', 'py':'stop',
+				'q':'stop',
+				'r':'liquid', 'rr':'stop', 'rx':'fricative', 'ry':'stop',
+				's':'fricative', 'sh':'fricative',
+				't':'stop', 'tcl':'stop', 'th':'fricative', 'ty':'stop',
+				'u':'vowel', 'uh':'vowel', 'uw':'vowel', 'uu':'vowel', 'ux':'vowel',
+				'v':'fricative', 'vf':'stop',
+				'w':'semivowel',
+				'y':'semivowel',
+				'z':'fricative', 'zh':'fricative',
+				'spn': 'stop'}
 
 		self.palatal_consonants = ['by', 'dy', 'fy', 'gy', 'hy',
 								   'jy', 'ky', 'ly', 'my', 'ny',
@@ -103,8 +117,8 @@ class labbu:
 	def get_length(self):
 		return len(self.lab) 
 
-	#overwrite the phoneme at a given index: labu.overwrite_phone(i, 'aa')
-	def overwrite_phone(self, i, new_phone):
+	#overwrite the phoneme at a given index: labu.change_phone(i, 'aa')
+	def change_phone(self, i, new_phone):
 		self.lab[i]['phone'] = new_phone
 
 	#merges the current index with the next index: labu.merge_phones(i, 'cl')
