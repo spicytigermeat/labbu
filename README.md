@@ -10,7 +10,7 @@ labu.load_lab({file_path_to_label})
 
 for i in range(len(labu.get_length())): #check in each index of the lab file
   if labu.curr_phone(i) == 'SP' and labu.next_phone(i) == 'aa':
-    labu.change_phone(i, 'slay')
+    labu.overwrite_phone(i, 'slay')
 
 labu.export_lab({output_path})
 ```
