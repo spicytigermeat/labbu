@@ -13,8 +13,8 @@ class labbu:
 		elif lang == 'japanese':
 			#is 'N' usually considered a vowel? Not sure, but adding this since i feel like it's worth it.
 			self.pho_dict={
-				'AP':'stop', 'SP':'stop','pau':'stop','sil','stop','br':'stop',
-				'a':'vowel', 'i':'vowel', 'u':'vowel', 'e':'vowel', 'o':'vowel', 'N':'vowel'
+				'AP':'stop', 'SP':'stop','pau':'stop','sil':'stop','br':'stop',
+				'a':'vowel', 'i':'vowel', 'u':'vowel', 'e':'vowel', 'o':'vowel', 'N':'vowel',
 				'b':'stop', 'by':'stop', 'ch':'affricate', 'd':'stop', 'dy':'stop',
 				'cl':'stop', 'f':'fricative', 'fy':'fricative', 'g':'stop', 'gy':'stop',
 				'h':'fricative', 'hy':'fricative', 'j':'affricate', #jh in english
@@ -22,7 +22,7 @@ class labbu:
 				'my':'nasal', 'n':'nasal', 'ny':'nasal', 'p':'stop', 'py':'stop',
 				'r':'stop', 'ry':'stop', 's':'fricative', 'sh':'fricative',
 				't':'stop', 'ts':'affricate', 'v':'fricative', 'vy':'fricative',
-				'w':'semivowel', 'y':'semivowel', 'z':'fricative', 'zy':'fricative'
+				'w':'semivowel', 'y':'semivowel', 'z':'fricative', 'zy':'fricative',
 				'vf':'stop', 'spn':'stop'}
 		else:
 			#default to my prewritten phoneme dictionary
