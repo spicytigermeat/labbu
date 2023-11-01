@@ -244,7 +244,7 @@ class labbu:
 		if self.curr_phone(i) != 'SP' or self.curr_phone(i) != 'AP':
 			try:
 				new_phone = re.sub(r'[0-9]', '', self.curr_phone(i))
-				self.overwrite_phone(i, new_phone.lower())
+				self.change_phone(i, new_phone.lower())
 			except TypeError as e:
 				print(f"Type Error at {i}: {e}")
 
