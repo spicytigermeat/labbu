@@ -42,7 +42,7 @@ class labbu:
 				'k':'stop', 'kcl': 'stop', 'ky':'stop',
 				'l':'liquid',
 				'm':'nasal', 'my':'nasal',
-				'n':'nasal', 'ng':'nasal', 'nx':'nasal', 'ny':'nasal', 'N':'nasal',
+				'n':'nasal', 'ng':'nasal', 'nx':'nasal', 'ny':'nasal', 'N':'vowel', 'nn':'vowel',
 				'o':'vowel', 'ow':'vowel', 'ox':'vowel', 'oy':'vowel', 'oo':'vowel',
 				'p':'stop', 'pcl':'stop', 'py':'stop',
 				'q':'stop',
