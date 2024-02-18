@@ -20,7 +20,7 @@ labu.export_lab({output_path})
 Further documentation and examples will come as labbu is developed.
 
 # Label Checker
-I've created a label checker for labbu! To run it, you'll need labbu installed with the proper depencies, and also will need to install click.
+I've created a label checker for labbu! This script will check for undefined phonemes in labels, as well as lables that are under 51000 units, or about 0.051 seconds (idk why I picked that number), which can cause issues when training. To run it, you'll need labbu installed with the proper depencies, and also will need to install click.
 
 `pip install click`
 
