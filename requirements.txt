@@ -1,1 +1,4 @@
 mytextgrid
+click
+PyYAML
+ftfy
